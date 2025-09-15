@@ -100,8 +100,13 @@ pub fn download(url: &str) -> bool {
     // Prepare command line
     let mut osascript = Command::new("osascript");
     let yt_dlp_path = yt_dlp_path();
+
+    // Escape the URL for AppleScript by replacing quotes and backslashes
+    let escaped_url = url.replace("\"", "\\\"").replace("\\", "\\\\");
+
     let script_download = format!(
-        "tell application \"Terminal\" to do script \"cd ~/Desktop; python3 {yt_dlp_path} {url} && exit\""
+        "tell application \"Terminal\" to do script \"cd ~/Desktop; python3 '{}' '{}' && exit\"",
+        yt_dlp_path, escaped_url
     );
     let download = osascript.args(["-e", script_download.as_str()]);
     download.status().is_ok()
