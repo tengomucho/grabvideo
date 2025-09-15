@@ -20,7 +20,11 @@ fn video_download(url: &str) -> bool {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![check_yt_dlp_setup, install_yt_dlp, video_download])
+        .invoke_handler(tauri::generate_handler![
+            check_yt_dlp_setup,
+            install_yt_dlp,
+            video_download
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
