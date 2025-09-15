@@ -9,7 +9,7 @@ async function download() {
   status.textContent = "Downloading...";
   var download_status = await invoke("video_download", { url: downloadInputEl.value });
   if (download_status) {
-    status.textContent = "Download completed.";
+    status.textContent = "Download launched correctly.";
     setTimeout(() => {
       status.classList.add("fade-out");
     }, 1000);
