@@ -20,4 +20,15 @@ To build the bundle you can run:
 cargo tauri build --bundles app
 ```
 
+To build the bundle as a universal macOS binary, you first need to install the rust target for the missing target:
+
+```sh
+rustup target add aarch64-apple-darwin
+rustup target add x86_64-apple-darwin
+```
+
+```sh
+tauri build --target universal-apple-darwin
+```
+
 For more information, check the Tauri documentation.
