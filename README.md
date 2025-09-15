@@ -6,3 +6,18 @@ I built this for a teacher that is not familiar with the terminal but needs some
 
 The code is based on [Tauri](https://tauri.app/), Rust + HTML.
 
+# Build the App
+
+To build the app while developing, you can run"
+
+```sh
+cargo tauri dev
+```
+
+To build the bundle you can run:
+
+```sh
+cargo tauri build --bundles app
+```
+
+For more information, check the Tauri documentation.
