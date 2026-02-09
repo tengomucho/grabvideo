@@ -90,6 +90,48 @@ version_needs_update() {
   return 0  # Needs update
 }
 
+
+# Ensure gum is installed for TUI
+ensure_gum() {
+  if command -v gum &>/dev/null; then
+    return 0
+  fi
+
+  case "$(uname -s)" in
+    Darwin)
+      echo "Installing gum..."
+      brew install -q gum 2>/dev/null || brew install gum
+      ;;
+    *)
+      echo "gum is required for the TUI. Please install it:" >&2
+      echo "  https://github.com/charmbracelet/gum?tab=readme-ov-file#installation" >&2
+      exit 1
+      ;;
+  esac
+}
+ensure_gum
+
+# Get clipboard content if possible
+get_clipboard() {
+  case "$(uname -s)" in
+    Darwin)
+      pbpaste 2>/dev/null || true
+      ;;
+    Linux)
+      if command -v wl-paste &>/dev/null; then
+        wl-paste 2>/dev/null || true
+      elif command -v xclip &>/dev/null; then
+        xclip -selection clipboard -o 2>/dev/null || true
+      elif command -v xsel &>/dev/null; then
+        xsel --clipboard --output 2>/dev/null || true
+      fi
+      ;;
+    *)
+      true
+      ;;
+  esac
+}
+
 # Main
 BINARY_NAME=$(detect_platform)
 LATEST_TAG=$(get_latest_tag)
@@ -116,6 +158,14 @@ if version_needs_update "$INSTALLED_VERSION" "$LATEST_TAG"; then
   mv "$TEMP_FILE" "$YTDLP_BINARY"
   echo "$LATEST_TAG" > "$VERSION_FILE"
   echo "Downloaded yt-dlp $LATEST_TAG to $YTDLP_BINARY"
-else
-  echo "yt-dlp $LATEST_TAG is already installed"
 fi
+
+CLIPBOARD=$(get_clipboard | head -1)
+if [[ -n "$CLIPBOARD" ]] && [[ "$CLIPBOARD" =~ ^https?:// ]]; then
+  gum confirm "Download from: $CLIPBOARD" --affirmative "OK" --negative "Cancel" || exit 1
+  URL="$CLIPBOARD"
+else
+  URL=$(gum input --placeholder "Enter video URL...") || exit 1
+fi
+
+echo "$URL"
