@@ -168,4 +168,8 @@ else
   URL=$(gum input --placeholder "Enter video URL...") || exit 1
 fi
 
-echo "$URL"
+if [[ "$URL" =~ ^http ]]; then
+  "$YTDLP_BINARY" "$URL"
+else
+  echo "$URL"
+fi
