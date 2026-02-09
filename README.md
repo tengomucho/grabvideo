@@ -1,34 +1,30 @@
 # Grabvideo
 
-This is a very simple GUI wrapper for [yt-dlp](https://github.com/yt-dlp/yt-dlp) video for macOS.
+A bash script that downloads videos from the internet using [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
-I built this for a teacher that is not familiar with the terminal but needs sometimes to grab a video from the internet to show it to her pupils.
+## What it does
 
-The code is based on [Tauri](https://tauri.app/), Rust + HTML.
+1. **Ensures yt-dlp is installed** – Creates `~/.grabvideo` if needed, checks the latest release on GitHub, and downloads the platform-appropriate yt-dlp binary into that directory when it’s missing or outdated.
 
-# Build the App
+2. **Installs gum** – Uses [gum](https://github.com/charmbracelet/gum) for the TUI. On macOS it installs via Homebrew if missing; on other platforms it prints instructions to install it.
 
-To build the app while developing, you can run"
+3. **Prompts for a URL** – If the clipboard contains a URL (starting with `http://` or `https://`), it shows a confirmation dialog. Otherwise it asks you to enter a URL.
 
-```sh
-cargo tauri dev
-```
+4. **Downloads the video** – Runs `~/.grabvideo/yt-dlp` with the URL as argument.
 
-To build the bundle you can run:
+## Supported platforms
 
-```sh
-cargo tauri build --bundles app
-```
+- macOS (darwin)
+- Linux (x86_64, aarch64)
 
-To build the bundle as a universal macOS binary, you first need to install the rust target for the missing target:
+## Usage
 
 ```sh
-rustup target add aarch64-apple-darwin
-rustup target add x86_64-apple-darwin
+./grabvideo.sh
 ```
 
-```sh
-tauri build --target universal-apple-darwin
-```
+## Dependencies
 
-For more information, check the Tauri documentation.
+- `curl` – for downloading yt-dlp
+- `gum` – for the TUI (auto-installed on macOS via Homebrew)
+- `ffmpeg` – recommended for yt-dlp (merging, post-processing)
