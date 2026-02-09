@@ -23,6 +23,16 @@ A bash script that downloads videos from the internet using [yt-dlp](https://git
 ./grabvideo.sh
 ```
 
+## macOS app
+
+On macOS, you can build a double-clickable app that opens Terminal and runs grabvideo from the Desktop:
+
+```sh
+./build-app.sh
+```
+
+This creates `GrabVideo.app`. Move it to your Desktop or Applications. When you double-click it, Terminal opens, changes to the Desktop, runs grabvideo, and closes on success or stays open with an error message on failure.
+
 ## Dependencies
 
 - `curl` – for downloading yt-dlp
