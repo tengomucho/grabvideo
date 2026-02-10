@@ -5,6 +5,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$SCRIPT_DIR/GrabVideo.app"
+VERSION="0.2.0"
 
 mkdir -p "$APP_DIR/Contents/MacOS"
 mkdir -p "$APP_DIR/Contents/Resources"
@@ -38,6 +39,10 @@ cat > "$APP_DIR/Contents/Info.plist" << PLIST
 	<string>GrabVideo</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>${VERSION}</string>
+	<key>CFBundleVersion</key>
+	<string>${VERSION}</string>
 ${ICON_FILE}	<key>LSUIElement</key>
 	<true/>
 </dict>
