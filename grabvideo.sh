@@ -9,38 +9,6 @@ GITHUB_API="https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest"
 # Ensure ~/.grabvideo exists
 mkdir -p "$GRABVIDEO_DIR"
 
-# Detect platform and set binary name
-detect_platform() {
-  local os
-  local arch
-  os=$(uname -s)
-  arch=$(uname -m)
-
-  case "$os" in
-    Darwin)
-      echo "yt-dlp_macos"
-      ;;
-    Linux)
-      case "$arch" in
-        x86_64)
-          echo "yt-dlp_linux"
-          ;;
-        aarch64)
-          echo "yt-dlp_linux_aarch64"
-          ;;
-        *)
-          echo "Unsupported Linux architecture: $arch" >&2
-          exit 1
-          ;;
-      esac
-      ;;
-    *)
-      echo "Unsupported platform: $os" >&2
-      exit 1
-      ;;
-  esac
-}
-
 # Fetch latest release tag from GitHub
 get_latest_tag() {
   local tag
@@ -133,7 +101,6 @@ get_clipboard() {
 }
 
 # Main
-BINARY_NAME=$(detect_platform)
 LATEST_TAG=$(get_latest_tag)
 
 if [[ -z "$LATEST_TAG" ]]; then
@@ -145,7 +112,7 @@ INSTALLED_VERSION=""
 [[ -f "$VERSION_FILE" ]] && INSTALLED_VERSION=$(cat "$VERSION_FILE")
 
 if version_needs_update "$INSTALLED_VERSION" "$LATEST_TAG"; then
-  DOWNLOAD_URL="https://github.com/yt-dlp/yt-dlp/releases/download/${LATEST_TAG}/${BINARY_NAME}"
+  DOWNLOAD_URL="https://github.com/yt-dlp/yt-dlp/releases/download/${LATEST_TAG}/yt-dlp"
   TEMP_FILE="${GRABVIDEO_DIR}/yt-dlp.$$"
 
   if ! curl -sL -o "$TEMP_FILE" "$DOWNLOAD_URL"; then
@@ -168,8 +135,17 @@ else
   URL=$(gum input --placeholder "Enter video URL...") || exit 1
 fi
 
+if [[ -z "$URL" ]]; then
+  exit 0
+fi
+
 if [[ "$URL" =~ ^http ]]; then
-  "$YTDLP_BINARY" "$URL"
+  PYTHON=$(command -v python3 2>/dev/null || command -v python 2>/dev/null)
+  if [[ -z "$PYTHON" ]]; then
+    echo "Python is required but not found" >&2
+    exit 1
+  fi
+  "$PYTHON" "$YTDLP_BINARY" "$URL"
 else
   echo "$URL"
 fi
