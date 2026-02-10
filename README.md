@@ -1,8 +1,19 @@
 # Grabvideo
 
-A bash script that downloads videos from the internet using [yt-dlp](https://github.com/yt-dlp/yt-dlp).
+A super-simpler video downloader based on [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
-## What it does
+The reason I built this instead of just using yt-dlp is that there are people that might not be familiar with the terminal, but that could still want to download a video to use for work, e.g.: some teachers...
+
+## Install macOS application bundle
+
+You can install GrabVideo as a ready-to-use macOS application bundle (no Terminal knowledge required):
+
+Go to [the latest release page](https://github.com/tengomucho/grabvideo/releases/latest) and download the `GrabVideo.app.zip` file. Unzip it, then move `GrabVideo.app` to your Desktop or Applications folder. Double-click to launch!
+
+The app will open your Terminal, run the video downloader, and close the window for you when it finishes (or leave it open with an error if something went wrong).
+
+
+## What the internal shell script does does
 
 1. **Ensures yt-dlp is installed** – Creates `~/.grabvideo` if needed, checks the latest release on GitHub, and downloads the Python (platform-independent) yt-dlp into that directory when it’s missing or outdated. Runs it with python3 or python.
 
