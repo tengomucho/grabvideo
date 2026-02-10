@@ -205,19 +205,14 @@ if [[ -z "$URL" ]]; then
   exit 0
 fi
 
-if [[ "$URL" =~ ^http ]]; then
-  PYTHON=$(command -v python3 2>/dev/null || command -v python 2>/dev/null)
-  if [[ -z "$PYTHON" ]]; then
-    echo "Python is required but not found" >&2
-    exit 1
-  fi
-  BROWSER=$(get_default_browser)
-  if [[ -n "$BROWSER" ]]; then
-    "$PYTHON" "$YTDLP_BINARY" --cookies-from-browser "$BROWSER" "$URL"
-  else
-    "$PYTHON" "$YTDLP_BINARY" "$URL"
-  fi
-else
-  echo "$URL is not a valid URL" >&2
+PYTHON=$(command -v python3 2>/dev/null || command -v python 2>/dev/null)
+if [[ -z "$PYTHON" ]]; then
+  echo "Python is required but not found" >&2
   exit 1
+fi
+BROWSER=$(get_default_browser)
+if [[ -n "$BROWSER" ]]; then
+  "$PYTHON" "$YTDLP_BINARY" --cookies-from-browser "$BROWSER" "$URL"
+else
+  "$PYTHON" "$YTDLP_BINARY" "$URL"
 fi
