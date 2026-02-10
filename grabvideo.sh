@@ -106,25 +106,24 @@ version_needs_update() {
 }
 
 
-# Ensure gum is installed for TUI
-ensure_gum() {
-  if command -v gum &>/dev/null; then
+# Ensure dialog is installed for TUI (avoids gum + macOS Terminal double-prompt issue)
+ensure_dialog() {
+  if command -v dialog &>/dev/null; then
     return 0
   fi
 
   case "$(uname -s)" in
     Darwin)
-      echo "Installing gum..."
-      brew install -q gum 2>/dev/null || brew install gum
+      echo "Installing dialog..."
+      brew install -q dialog 2>/dev/null || brew install dialog
       ;;
     *)
-      echo "gum is required for the TUI. Please install it:" >&2
-      echo "  https://github.com/charmbracelet/gum?tab=readme-ov-file#installation" >&2
+      echo "dialog is required for the TUI. Please install it (e.g. apt install dialog, dnf install dialog):" >&2
       exit 1
       ;;
   esac
 }
-ensure_gum
+ensure_dialog
 
 # Ensure deno is installed to allow yt-dlp to download videos that require authentication
 ensure_deno() {
@@ -196,10 +195,10 @@ fi
 
 CLIPBOARD=$(get_clipboard | head -1)
 if [[ -n "$CLIPBOARD" ]] && [[ "$CLIPBOARD" =~ ^https?:// ]]; then
-  gum confirm "Download from: $CLIPBOARD" --affirmative "OK" --negative "Cancel" || exit 1
+  dialog --yesno "Download from: $CLIPBOARD?" 8 60 2>/dev/tty || exit 1
   URL="$CLIPBOARD"
 else
-  URL=$(gum input --placeholder "Enter video URL...") || exit 1
+  URL=$(dialog --stdout --inputbox "Enter video URL:" 8 60 2>/dev/tty) || exit 1
 fi
 
 if [[ -z "$URL" ]]; then
@@ -214,12 +213,11 @@ if [[ "$URL" =~ ^http ]]; then
   fi
   BROWSER=$(get_default_browser)
   if [[ -n "$BROWSER" ]]; then
-    echo "$PYTHON" "$YTDLP_BINARY" --cookies-from-browser "$BROWSER" "$URL"
     "$PYTHON" "$YTDLP_BINARY" --cookies-from-browser "$BROWSER" "$URL"
   else
-    echo "$PYTHON" "$YTDLP_BINARY" "$URL"
     "$PYTHON" "$YTDLP_BINARY" "$URL"
   fi
 else
-  echo "$URL"
+  echo "$URL is not a valid URL" >&2
+  exit 1
 fi
