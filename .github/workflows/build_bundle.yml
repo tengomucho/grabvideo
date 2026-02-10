@@ -1,4 +1,4 @@
-name: 'publish'
+name: Build bundle
 
 on:
   workflow_dispatch:
@@ -7,44 +7,38 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
-  publish-tauri:
+  build:
     permissions:
       contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above).
-            args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest' # for Intel based macs.
-            args: '--target x86_64-apple-darwin'
-
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+      - name: Set version from tag
+        if: github.ref_type == 'tag'
+        run: echo "BUILD_VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_ENV"
+
+      - name: Build GrabVideo.app
+        run: ./build-app.sh
+
+      - name: Zip app bundle
+        run: |
+          [[ -n "$BUILD_VERSION" ]] || exit 1
+          zip -r "GrabVideo-${BUILD_VERSION}.zip" GrabVideo.app
+
+      - name: Upload artifact
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
         with:
-          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          name: GrabVideo-app
+          path: GrabVideo-*.zip
 
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
+      - name: Create release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
         with:
-          workspaces: './src-tauri -> target'
-
-    #   - name: install frontend dependencies
-    #     # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
-    #     run: yarn install # change this to npm or pnpm depending on which one you use.
-
-      - uses: tauri-apps/tauri-action@v0
+          name: GrabVideo ${{ github.ref_name }}
+          files: GrabVideo-*.zip
+          draft: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
-          releaseName: 'App v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          prerelease: false
-          args: ${{ matrix.args }}
