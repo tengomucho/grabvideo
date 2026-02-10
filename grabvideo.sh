@@ -42,6 +42,53 @@ get_latest_tag() {
   echo "$tag"
 }
 
+# Get default browser name for yt-dlp --cookies-from-browser (brave, chrome, chromium, edge, firefox, opera, safari, vivaldi, whale)
+get_default_browser() {
+  local bundle_id desktop_name
+  case "$(uname -s)" in
+    Darwin)
+      bundle_id=$("${PYTHON:-python3}" -c "
+import plistlib, os
+path = os.path.expanduser('~/Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist')
+try:
+    with open(path, 'rb') as f:
+        data = plistlib.load(f)
+    for h in data.get('LSHandlers', []):
+        if h.get('LSHandlerURLScheme') in ('https', 'http'):
+            print(h.get('LSHandlerRoleAll', ''))
+            break
+except Exception:
+    pass
+" 2>/dev/null)
+      case "$bundle_id" in
+        com.apple.Safari) echo "safari" ;;
+        com.google.Chrome|com.google.chrome) echo "chrome" ;;
+        com.microsoft.edgemac) echo "edge" ;;
+        org.mozilla.firefox) echo "firefox" ;;
+        com.operasoftware.Opera) echo "opera" ;;
+        com.brave.Browser) echo "brave" ;;
+        org.chromium.Chromium) echo "chromium" ;;
+        com.vivaldi.Vivaldi) echo "vivaldi" ;;
+        com.whale.Whale|com.naver.whale) echo "whale" ;;
+        *) true ;;
+      esac
+      ;;
+    Linux)
+      desktop_name=$(xdg-mime query default x-scheme-handler/https 2>/dev/null || xdg-mime query default x-scheme-handler/http 2>/dev/null)
+      case "$desktop_name" in
+       *firefox*) echo "firefox" ;;
+       *chrome*|*chromium*) echo "chrome" ;;
+       *brave*) echo "brave" ;;
+       *edge*) echo "edge" ;;
+       *opera*) echo "opera" ;;
+       *vivaldi*) echo "vivaldi" ;;
+        *) true ;;
+      esac
+      ;;
+    *) true ;;
+  esac
+}
+
 # Compare versions (simple string comparison; yt-dlp uses YYYY.MM.DD format)
 version_needs_update() {
   local installed="$1"
@@ -145,7 +192,14 @@ if [[ "$URL" =~ ^http ]]; then
     echo "Python is required but not found" >&2
     exit 1
   fi
-  "$PYTHON" "$YTDLP_BINARY" "$URL"
+  BROWSER=$(get_default_browser)
+  if [[ -n "$BROWSER" ]]; then
+    echo "$PYTHON" "$YTDLP_BINARY" --cookies-from-browser "$BROWSER" "$URL"
+    "$PYTHON" "$YTDLP_BINARY" --cookies-from-browser "$BROWSER" "$URL"
+  else
+    echo "$PYTHON" "$YTDLP_BINARY" "$URL"
+    "$PYTHON" "$YTDLP_BINARY" "$URL"
+  fi
 else
   echo "$URL"
 fi
