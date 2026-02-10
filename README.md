@@ -8,7 +8,12 @@ The reason I built this instead of just using yt-dlp is that there are people th
 
 You can install GrabVideo as a ready-to-use macOS application bundle (no Terminal knowledge required):
 
-Go to [the latest release page](https://github.com/tengomucho/grabvideo/releases/latest) and download the `GrabVideo.app.zip` file. Unzip it, then move `GrabVideo.app` to your Desktop or Applications folder. Double-click to launch!
+Go to [the latest release page](https://github.com/tengomucho/grabvideo/releases/latest) and download the `GrabVideo.zip` file. Unzip it, then move `GrabVideo.app` to your Desktop or Applications folder.
+
+**First launch:** macOS may say the app "could not be verified" (the app is open-source and not signed with an Apple certificate). Use **Right-click → Open** and then click "Open" in the dialog.
+Or **System Settings → Privacy & Security** and use “Open Anyway” when the app is blocked.
+
+After that you can open it normally by double-clicking.
 
 The app will open your Terminal, run the video downloader, and close the window for you when it finishes (or leave it open with an error if something went wrong).
 
