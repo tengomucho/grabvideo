@@ -193,13 +193,12 @@ if version_needs_update "$INSTALLED_VERSION" "$LATEST_TAG"; then
   echo "Downloaded yt-dlp $LATEST_TAG to $YTDLP_BINARY"
 fi
 
+DEFAULT_URL=""
 CLIPBOARD=$(get_clipboard | head -1)
 if [[ -n "$CLIPBOARD" ]] && [[ "$CLIPBOARD" =~ ^https?:// ]]; then
-  dialog --yesno "Download from: $CLIPBOARD?" 8 60 2>/dev/tty || exit 1
-  URL="$CLIPBOARD"
-else
-  URL=$(dialog --stdout --inputbox "Enter video URL:" 8 60 2>/dev/tty) || exit 1
+  DEFAULT_URL="$CLIPBOARD"
 fi
+URL=$(dialog --stdout --inputbox "Enter video URL:" 8 60 2>/dev/tty "$DEFAULT_URL") || exit 0
 
 if [[ -z "$URL" ]]; then
   exit 0
