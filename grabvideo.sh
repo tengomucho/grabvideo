@@ -126,6 +126,26 @@ ensure_gum() {
 }
 ensure_gum
 
+# Ensure deno is installed to allow yt-dlp to download videos that require authentication
+ensure_deno() {
+  if command -v deno &>/dev/null; then
+    return 0
+  fi
+
+  case "$(uname -s)" in
+    Darwin)
+      echo "Installing deno..."
+      brew install -q deno 2>/dev/null || brew install deno
+      ;;
+    *)
+      echo "deno is required to download videos that require authentication. Please install it:" >&2
+      echo "  https://deno.com/download" >&2
+      exit 1
+      ;;
+  esac
+}
+ensure_deno
+
 # Get clipboard content if possible
 get_clipboard() {
   case "$(uname -s)" in
