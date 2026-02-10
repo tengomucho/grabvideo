@@ -9,36 +9,8 @@ APP_DIR="$SCRIPT_DIR/GrabVideo.app"
 mkdir -p "$APP_DIR/Contents/MacOS"
 mkdir -p "$APP_DIR/Contents/Resources"
 
-# Launcher script
-cat > "$APP_DIR/Contents/MacOS/GrabVideo" << 'LAUNCHER'
-#!/bin/bash
-[[ "$(uname -s)" != "Darwin" ]] && { echo "macOS only"; exit 1; }
-
-BUNDLE_RESOURCES="$(cd "$(dirname "$0")/../Resources" && pwd)"
-GRABVIDEO_SCRIPT="$BUNDLE_RESOURCES/grabvideo.sh"
-GRABVIDEO_DIR="${HOME}/.grabvideo"
-LAUNCHER_SCRIPT="${GRABVIDEO_DIR}/GrabVideoLauncher.command"
-
-mkdir -p "$GRABVIDEO_DIR"
-cat > "$LAUNCHER_SCRIPT" << EOF
-#!/bin/bash
-cd ~/Desktop
-sleep 0.5
-"$GRABVIDEO_SCRIPT"
-RESULT=\$?
-if [ \$RESULT -eq 0 ]; then
-  (sleep 0.3; osascript -e 'tell application "Terminal" to close front window' 2>/dev/null) &
-  exit 0
-else
-  echo ""
-  echo "An error has occurred. To exit, type Cmd + Q"
-  exec \$SHELL
-fi
-EOF
-
-chmod +x "$LAUNCHER_SCRIPT"
-open "$LAUNCHER_SCRIPT"
-LAUNCHER
+# Launcher script (copied into app bundle; runs with argv[0] inside Contents/MacOS/)
+cp "$SCRIPT_DIR/GrabVideo-launcher.sh" "$APP_DIR/Contents/MacOS/GrabVideo"
 
 # Info.plist
 cat > "$APP_DIR/Contents/Info.plist" << 'PLIST'
