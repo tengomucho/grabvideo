@@ -2,7 +2,7 @@
 
 A super-simpler video downloader based on [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
-The reason I built this instead of just using yt-dlp is that there are people that might not be familiar with the terminal, but that could still want to download a video to use for work, e.g.: some teachers...
+The reason I built this instead of just using yt-dlp is that there are people that might not be familiar with the terminal, but that could still want to download a video to use for work, e.g.: some teachers that might not comfortable using the terminal but that want to work with a video on class when internet connection is unreliable.
 
 ## Install macOS application bundle
 
